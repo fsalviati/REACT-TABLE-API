@@ -7,8 +7,6 @@ import CreateIcon from '@material-ui/icons/Create';
 import { DataGrid } from '@material-ui/data-grid';
 import { withRouter } from 'react-router-dom';
 
-
-
 class TableUser extends Component {
 
     constructor(props) {
@@ -19,7 +17,7 @@ class TableUser extends Component {
             isError: false,
             search: ''
         }
-    }
+    };
 
     handleChange(event) {
         // Get event value
@@ -39,8 +37,13 @@ class TableUser extends Component {
         }
     };
 
+    async componentDidUpdate() {
+
+    };
+
     render() {
         let usersArr = this.state.users;
+        console.log('usersArr = ', usersArr)
         let searchString = this.state.search.trim().toLowerCase();
         if (searchString.length > 0) {
             usersArr = usersArr.filter((e) => e.clientName.toLowerCase().match(searchString));
@@ -114,8 +117,13 @@ class TableUser extends Component {
                                     }}
                                 />
                                 <div style={{ height: 650, width: '100%', backgroundColor: "white" }}>
-                                    <DataGrid components={{ Toolbar: CustomToolbar }}
-                                        rows={rows} columns={columns} pageSize={10} checkboxSelection autoPageSize />
+                                    <DataGrid
+                                        components={{ Toolbar: CustomToolbar }}
+                                        rows={rows} columns={columns}
+                                        pageSize={10}
+                                        checkboxSelection
+                                        autoPageSize
+                                        selectedRows={this.state.selectedRows} />
                                 </div>
                             </div>
                         )

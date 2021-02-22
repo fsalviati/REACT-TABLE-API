@@ -8,7 +8,7 @@ import FilterListIcon from '@material-ui/icons/FilterList';
 import AddIcon from '@material-ui/icons/Add';
 import User from './User';
 import { useState } from "react";
-import { useEffect } from "react";
+
 
 const useStyles = makeStyles(theme => ({
   buttonFilter: {
@@ -40,7 +40,7 @@ function App() {
 
   return (
     <Grid className="container" container direction="column" >
-      <p>MANAGEMENT</p>
+      <p>Management</p>
       <form>
         <p className={classes.clientsTitle}>Clients</p>
         <Link to="/NewClient">

@@ -172,7 +172,12 @@ const ClientForm = (props) => {
             toast.error("Please fix fields in red");
             return;
         }
-        postFormDataUpdate();
+        if (props.match.params.clientId) {
+            postFormDataUpdate();
+        }
+        else {
+            postFormData();
+        }
 
     };
 
