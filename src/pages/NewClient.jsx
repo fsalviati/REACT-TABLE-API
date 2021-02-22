@@ -1,10 +1,8 @@
 import React from "react";
 import {
     Button,
-    createMuiTheme,
     Grid,
     TextField,
-    ThemeProvider,
     Typography,
     makeStyles
 } from "@material-ui/core";
@@ -12,14 +10,14 @@ import LanguageIcon from "@material-ui/icons/Language";
 import FacebookIcon from "@material-ui/icons/Facebook";
 import InstagramIcon from "@material-ui/icons/Instagram";
 import TwitterIcon from "@material-ui/icons/Twitter";
-import { teal } from "@material-ui/core/colors";
 import { useHistory } from "react-router-dom";
 import { useState } from "react";
+import { toast } from "react-toastify";
 import axios from "axios";
-import { v4 as uuidv4 } from "uuid";
 import { useEffect } from "react";
 import SaveIcon from '@material-ui/icons/Save';
 import CancelIcon from '@material-ui/icons/Cancel';
+import User from '../User';
 
 const useStyles = makeStyles(theme => ({
     fieldForm: {
@@ -55,10 +53,10 @@ const ClientForm = (props) => {
         addDate: "",
         updateDate: ""
     });
-
+    const [formErrors, setFormErrors] = useState({});
     const classes = useStyles();
-
     const history = useHistory();
+
     const handleOnCancelClick = () => {
         history.push("/");
     };
@@ -73,10 +71,113 @@ const ClientForm = (props) => {
                 )
                 .then((client) => setFormData(client.data));
         }
-    }, [props.match.params.clientId]);
+    }, [props.match.params.clientId]
+    );
+
+
+    const handleOnChange = (event) => {
+        setFormData({ ...formData, [event.target.name]: event.target.value });
+    };
+
+    const isFormValid = () => {
+        const _formErrors = {};
+        const phoneRegex = /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/;
+        const emailRegex = /[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/gm;
+
+        // email
+        if (!emailRegex.test(formData.clientEmail)) {
+            _formErrors.clientEmail =
+                "You must enter a valid email address, i.e. example@example.com";
+        }
+
+        // phone number
+        if (!phoneRegex.test(formData.clientWorkPhone.replace(/ /g, ""))) {
+            _formErrors.clientWorkPhone =
+                "Please enter a valid phone number, i.e. +61 111 111 111";
+        }
+        setFormErrors(_formErrors);
+        return Object.keys(_formErrors).length === 0;
+    };
+
+
+    // POST METHOD
+    async function postFormData() {
+        const postData = {
+            tenantId: "reesby",
+            clientName: formData.clientName,
+            clientWorkPhone: formData.clientWorkPhone,
+            clientPersonalPhone: formData.clientPersonalPhone,
+            clientPocName: formData.clientPocName,
+            clientIndustry: formData.clientIndustry,
+            clientFax: formData.clientFax,
+            clientEmail: formData.clientEmail,
+            clientWebsite: formData.clientWebsite,
+            clientAddress: formData.clientAddress,
+            clientContract: formData.clientContract,
+            clientAvatarURL: formData.clientAvatarURL,
+            facebook: formData.facebook,
+            instagram: formData.instagram,
+            twitter: formData.twitter
+        };
+        try {
+            axios.post(
+                "http://javareesbyapi-env.eba-rtdeyeqd.ap-southeast-2.elasticbeanstalk.com/api/v1/addclient/",
+                postData
+            );
+            toast.success("Form successfully submitted!");
+            history.push("/");
+        } catch (err) {
+            console.warn(err); //failed to fetch
+            toast.error("Your form was not submitted, please try again.");
+        }
+    }
+
+    // PUT METHOD
+    async function postFormDataUpdate() {
+        const postData = {
+            clientId: formData.clientId,
+            tenantId: "reesby",
+            clientName: formData.clientName,
+            clientWorkPhone: formData.clientWorkPhone,
+            clientPersonalPhone: formData.clientPersonalPhone,
+            clientPocName: formData.clientPocName,
+            clientIndustry: formData.clientIndustry,
+            clientFax: formData.clientFax,
+            clientEmail: formData.clientEmail,
+            clientWebsite: formData.clientWebsite,
+            clientAddress: formData.clientAddress,
+            clientContract: formData.clientContract,
+            clientAvatarURL: formData.clientAvatarURL,
+            facebook: formData.facebook,
+            instagram: formData.instagram,
+            twitter: formData.twitter
+        };
+        try {
+            axios.put(
+                "http://javareesbyapi-env.eba-rtdeyeqd.ap-southeast-2.elasticbeanstalk.com/api/v1/updateclient/",
+                postData
+            );
+            toast.success("Form successfully submitted!");
+            history.push("/");
+        } catch (err) {
+            console.warn(err); //failed to fetch
+            toast.error("Your form was not submitted, please try again.");
+        }
+    }
+
+    const handleOnSubmitForm = (event) => {
+        event.preventDefault();
+
+        if (!isFormValid()) {
+            toast.error("Please fix fields in red");
+            return;
+        }
+        postFormDataUpdate();
+
+    };
 
     return (
-        <form className={classes.mainContainer}>
+        <form onSubmit={handleOnSubmitForm} className={classes.mainContainer}>
             <Grid container justify="center">
                 <Grid item>
                     <Typography variant="h3" color="primary">
@@ -103,9 +204,9 @@ const ClientForm = (props) => {
                             required
                             name="clientName"
                             value={formData.clientName || ""}
-                        //   onChange={handleOnChange}
-                        // error={!!formErrors.clientName}
-                        // helperText={formErrors.clientName}
+                            onChange={handleOnChange}
+                            error={!!formErrors.clientName}
+                            helperText={formErrors.clientName}
                         />
                     </Grid>
                 </Grid>
@@ -121,9 +222,9 @@ const ClientForm = (props) => {
                             fullWidth
                             name="clientEmail"
                             value={formData.clientEmail}
-                        //   onChange={handleOnChange}
-                        //   error={!!formErrors.clientEmail}
-                        //   helperText={formErrors.clientEmail}
+                            onChange={handleOnChange}
+                            error={!!formErrors.clientEmail}
+                            helperText={formErrors.clientEmail}
                         />
                     </Grid>
                     {/* Work Phone field */}
@@ -136,9 +237,9 @@ const ClientForm = (props) => {
                             fullWidth
                             name="clientWorkPhone"
                             value={formData.clientWorkPhone}
-                        //   onChange={handleOnChange}
-                        //   error={!!formErrors.clientWorkPhone}
-                        //   helperText={formErrors.clientWorkPhone}
+                            onChange={handleOnChange}
+                            error={!!formErrors.clientWorkPhone}
+                            helperText={formErrors.clientWorkPhone}
                         />
                     </Grid>
                 </Grid>
@@ -154,7 +255,7 @@ const ClientForm = (props) => {
                             fullWidth
                             name="clientAddress"
                             value={formData.clientAddress || ""}
-                        //   onChange={handleOnChange}
+                            onChange={handleOnChange}
                         />
                     </Grid>
                     <Grid item sm={4} xs={12} md={3}>
@@ -165,7 +266,7 @@ const ClientForm = (props) => {
                             fullWidth
                             name="clientPersonalPhone"
                             value={formData.clientPersonalPhone || ""}
-                        //   onChange={handleOnChange}
+                            onChange={handleOnChange}
                         />
                     </Grid>
                 </Grid>
@@ -181,7 +282,7 @@ const ClientForm = (props) => {
                             fullWidth
                             name="clientPocName"
                             value={formData.clientPocName || ""}
-                        //   onChange={handleOnChange}
+                            onChange={handleOnChange}
                         />
                     </Grid>
                     <Grid item sm={4} xs={12} md={3}>
@@ -192,7 +293,7 @@ const ClientForm = (props) => {
                             fullWidth
                             name="clientFax"
                             value={formData.clientFax || ""}
-                        //   onChange={handleOnChange}
+                            onChange={handleOnChange}
                         />
                     </Grid>
                 </Grid>
@@ -208,7 +309,7 @@ const ClientForm = (props) => {
                             fullWidth
                             name="clientIndustry"
                             value={formData.clientIndustry || ""}
-                        //   onChange={handleOnChange}
+                            onChange={handleOnChange}
                         />
                     </Grid>
                     <Grid item sm={4} xs={12} md={3}>
@@ -219,7 +320,7 @@ const ClientForm = (props) => {
                             fullWidth
                             name="clientContract"
                             value={formData.clientContract || ""}
-                        //   onChange={handleOnChange}
+                            onChange={handleOnChange}
                         />
                     </Grid>
                 </Grid>
@@ -239,7 +340,7 @@ const ClientForm = (props) => {
                                 fullWidth
                                 name="clientWebsite"
                                 value={formData.clientWebsite || ""}
-                            // onChange={handleOnChange}
+                                onChange={handleOnChange}
                             />
                         </Grid>
                     </Grid>
@@ -257,7 +358,7 @@ const ClientForm = (props) => {
                                 fullWidth
                                 name="facebook"
                                 value={formData.facebook || ""}
-                            // onChange={handleOnChange}
+                                onChange={handleOnChange}
                             />
                         </Grid>
                     </Grid>
@@ -280,7 +381,7 @@ const ClientForm = (props) => {
                                 fullWidth
                                 name="instagram"
                                 value={formData.instagram || ""}
-                            // onChange={handleOnChange}
+                                onChange={handleOnChange}
                             />
                         </Grid>
                     </Grid>
@@ -299,7 +400,7 @@ const ClientForm = (props) => {
                                 fullWidth
                                 name="twitter"
                                 value={formData.twitter || ""}
-                            // onChange={handleOnChange}
+                                onChange={handleOnChange}
                             />
                         </Grid>
                     </Grid>

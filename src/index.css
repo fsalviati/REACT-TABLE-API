@@ -6,6 +6,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: rgb(243, 243, 243);
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 code {
@@ -14,7 +16,7 @@ code {
 }
 
 .container{
-  margin: 5px 30px;
+  margin: 5px 60px;
   color: rgb(12, 11, 11);
 }
 
@@ -22,3 +24,4 @@ code {
   background-color: #f1f1f1;
   font-size: 17px;
 }
+
