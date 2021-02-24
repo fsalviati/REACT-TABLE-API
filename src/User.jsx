@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import SearchIcon from '@material-ui/icons/Search';
@@ -15,7 +15,8 @@ class TableUser extends Component {
             users: [],
             isLoading: false,
             isError: false,
-            search: ''
+            search: '',
+            isUpdating: false,
         }
     };
 
@@ -25,6 +26,10 @@ class TableUser extends Component {
         // Set the state to trigger a re-rendering
         this.setState({ search: searchValue });
     };
+
+    // changeStateEdit = () => {
+    //     this.setState({ isUpdating: true });
+    // }
 
     async componentDidMount() {
         this.setState({ isLoading: true })
@@ -43,7 +48,6 @@ class TableUser extends Component {
 
     render() {
         let usersArr = this.state.users;
-        console.log('usersArr = ', usersArr)
         let searchString = this.state.search.trim().toLowerCase();
         if (searchString.length > 0) {
             usersArr = usersArr.filter((e) => e.clientName.toLowerCase().match(searchString));
@@ -70,13 +74,15 @@ class TableUser extends Component {
                     const handleEditClient = (clientId) => {
                         this.props.history.push({ pathname: `/newclient/${clientId}`, state: clientId });
                     };
-                    return <Button onClick={() => {
-                        handleEditClient(rows[params.rowIndex].clientId)
-                    }
-                    } style={{
-                        color: "rgb(81, 49, 185)",
-                        border: "solid 1px rgb(81, 49, 185)"
-                    }}
+                    return <Button
+                        onClick={() => {
+                            // this.changeStateEdit();
+                            handleEditClient(rows[params.rowIndex].clientId);
+                        }}
+                        style={{
+                            color: "rgb(81, 49, 185)",
+                            border: "solid 1px rgb(81, 49, 185)"
+                        }}
                         startIcon={< CreateIcon style={{
                             fontSize: "23",
                             marginLeft: "13"
@@ -101,6 +107,7 @@ class TableUser extends Component {
                 })
         })
         return (
+
             <div style={{ maxWidth: "95%" }}>
                 {
                     this.state.isLoading || !this.state.users ?
